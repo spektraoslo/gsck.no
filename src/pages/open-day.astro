@@ -1,0 +1,786 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const registrationUrl =
+  'https://docs.google.com/forms/d/e/1FAIpQLSdhA71OjzzEwULnNWKqclV2larcRc7vxdnR2eP1API_h2B-9w/viewform';
+
+const eventDateISO = '2026-08-16T14:00:00+02:00'; // Oslo local
+
+const icons: Record<string, string> = {
+  calendar: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>`,
+  clock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>`,
+  pin: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s-7-7.5-7-13a7 7 0 0 1 14 0c0 5.5-7 13-7 13z"/><circle cx="12" cy="9" r="2.5"/></svg>`,
+  people: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M15 20a4.5 4.5 0 0 1 6.5-4"/></svg>`,
+  bat: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l4-4"/><path d="M8.5 15.5l-3-3L14 4l3 3z"/><circle cx="5" cy="19" r="1.5" fill="currentColor"/></svg>`,
+  team: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="3"/><circle cx="5" cy="10" r="2.5"/><circle cx="19" cy="10" r="2.5"/><path d="M6 20a6 6 0 0 1 12 0"/><path d="M2 20a4 4 0 0 1 4-4"/><path d="M22 20a4 4 0 0 0-4-4"/></svg>`,
+  whistle: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6c-4.4 0-8 3.6-8 8s3.6 8 8 8 8-3.6 8-8v-3l-5-5z"/><path d="M17 3l3 3"/><circle cx="14" cy="14" r="2"/></svg>`,
+  heart: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.5-9.5-9A5 5 0 0 1 12 6a5 5 0 0 1 9.5 6C19 16.5 12 21 12 21z"/></svg>`,
+  gift: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v14M5 12v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9"/><path d="M12 8s-2-4-5-4a2.5 2.5 0 0 0 0 5"/><path d="M12 8s2-4 5-4a2.5 2.5 0 0 1 0 5"/></svg>`,
+  cup: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5h12v8a6 6 0 0 1-12 0z"/><path d="M17 8h2a2 2 0 0 1 0 4h-2"/><path d="M4 22h14"/></svg>`,
+  email: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>`,
+  instagram: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/></svg>`,
+};
+
+const experiences = [
+  { title: 'Open Training & Trials',      desc: 'Batting, bowling, wicket-keeping — try it all with real coaches.', icon: 'bat' },
+  { title: 'Team Distribution & Formation', desc: 'Get placed into a team, meet your squad, and start playing together.', icon: 'team' },
+  { title: 'Pro Coaching',                  desc: 'Experienced, supportive coaches. Beginners very welcome.', icon: 'whistle' },
+  { title: 'Fun · Inclusive · Team Spirit', desc: 'A friendly, welcoming atmosphere from the very first ball.', icon: 'heart' },
+  { title: 'Goodie Bags for All Kids',      desc: 'Every child leaves with an exclusive GSCK goodie bag.', icon: 'gift' },
+  { title: 'Refreshments & Club Vision Q&A', desc: 'Snacks, drinks, and a chat with the club about what comes next.', icon: 'cup' },
+];
+
+const infoStrip = [
+  { label: 'Date',  value: 'Sat, 16 August 2026', icon: 'calendar' },
+  { label: 'Time',  value: '14:00 – 19:00',        icon: 'clock' },
+  { label: 'Venue', value: 'Rommen Mini, Oslo',    icon: 'pin' },
+  { label: 'For',   value: 'Kids & Women',          icon: 'people' },
+];
+---
+
+<Layout
+  title="Open Day"
+  description="GSCK Open Day — Cricket for Kids & Women. Saturday 16 August 2026, 14:00–19:00, Rommen Mini, Oslo. Register free."
+>
+  <!-- ── HERO ────────────────────────────────────────────── -->
+  <section class="od-hero">
+    <div class="od-hero-bg" aria-hidden="true">
+      <div class="dot d1"></div>
+      <div class="dot d2"></div>
+      <div class="dot d3"></div>
+      <div class="dot d4"></div>
+      <div class="dot d5"></div>
+      <div class="grid-lines"></div>
+    </div>
+
+    <div class="container od-hero-inner">
+      <div class="od-hero-text">
+        <span class="pulse-pill">
+          <span class="dot-live"></span>
+          Save the date · 16 August 2026
+        </span>
+        <h1>
+          <span class="over">Cricket for</span>
+          <span class="main"><em>Kids</em> &amp; <em>Women</em></span>
+          <span class="under">Open Day</span>
+        </h1>
+        <p class="lead">
+          Ready for new friends, new experiences, and lots of fun? GSCK is throwing open
+          the gates for the community — all ages, all skill levels, no experience needed.
+          Bring a smile and we'll bring the bats.
+        </p>
+
+        <div class="countdown" data-countdown data-target={eventDateISO}>
+          <div class="cd-cell"><span class="n" data-d>–</span><span class="l">Days</span></div>
+          <div class="cd-cell"><span class="n" data-h>–</span><span class="l">Hours</span></div>
+          <div class="cd-cell"><span class="n" data-m>–</span><span class="l">Minutes</span></div>
+          <div class="cd-cell"><span class="n" data-s>–</span><span class="l">Seconds</span></div>
+        </div>
+
+        <div class="od-cta">
+          <a class="btn" href={registrationUrl} target="_blank" rel="noopener">Register — it's free</a>
+          <a class="btn ghost" href="#details">See what's in store ↓</a>
+        </div>
+      </div>
+
+      <div class="od-hero-visual">
+        <div class="collage">
+          <div class="tile tile-photo">
+            <img src="/openday-kids.jpg" alt="Kids playing cricket at practice" />
+          </div>
+          <div class="tile tile-illo">
+            <img src="/openday-female.avif" alt="Illustration of a female cricketer batting" />
+          </div>
+          <div class="badge-float" aria-hidden="true">
+            <img src="/gsck-logo.png" alt="" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── INFO STRIP ─────────────────────────────────────── -->
+  <section class="od-info">
+    <div class="container">
+      <div class="info-grid">
+        {infoStrip.map((i) => (
+          <div class="info-item">
+            <div class="info-icon" set:html={icons[i.icon]}></div>
+            <div class="info-body">
+              <div class="info-label">{i.label}</div>
+              <div class="info-value">{i.value}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ── WHAT'S IN STORE ────────────────────────────────── -->
+  <section id="details" class="section">
+    <div class="container">
+      <div class="section-eyebrow">What's in store</div>
+      <h2 class="section-title">A whole afternoon of cricket</h2>
+      <p class="od-sub">
+        Whether you've never held a bat or you've been playing for years, there's a spot
+        for you.
+      </p>
+
+      <div class="exp-grid">
+        {experiences.map((e) => (
+          <article class="exp-card">
+            <div class="exp-icon" set:html={icons[e.icon]}></div>
+            <h3>{e.title}</h3>
+            <p>{e.desc}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ── WHO CAN JOIN ───────────────────────────────────── -->
+  <section class="section who">
+    <div class="container">
+      <div class="section-eyebrow">Who can join</div>
+      <h2 class="section-title">Everyone. Really.</h2>
+
+      <div class="who-grid">
+        <article class="who-card kids">
+          <div class="who-img">
+            <img src="/openday-kids-illo.jpg" alt="" />
+          </div>
+          <div class="who-text">
+            <span class="who-tag">Tiny stars</span>
+            <h3>Kids of all ages</h3>
+            <p>
+              Boys and girls, all skill levels — from first-timers to little all-rounders.
+              We'll teach the basics, keep it playful, and hand out goodie bags to every
+              child.
+            </p>
+          </div>
+        </article>
+
+        <article class="who-card women">
+          <div class="who-img">
+            <img src="/openday-women.avif" alt="" />
+          </div>
+          <div class="who-text">
+            <span class="who-tag">Shining ladies</span>
+            <h3>Women, all levels</h3>
+            <p>
+              Curious about cricket? Come and try. Coaches on hand, all equipment
+              provided. We're actively building a Women's team at GSCK and this is the
+              perfect way to be part of it from day one.
+            </p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── REGISTER CTA ───────────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <div class="cta-banner">
+        <div class="cta-text">
+          <div class="section-eyebrow">Ready to join?</div>
+          <h2>Grab your spot.</h2>
+          <p>
+            Spaces are open to everyone — just tell us who's coming. Registration takes
+            under a minute.
+          </p>
+          <p class="cta-actions">
+            <a class="btn" href={registrationUrl} target="_blank" rel="noopener">
+              Register now
+            </a>
+            <a class="btn ghost" href="mailto:spektraoslo@gmail.com">
+              Ask a question
+            </a>
+          </p>
+          <div class="cta-contacts">
+            <a class="contact-chip" href="mailto:spektraoslo@gmail.com" aria-label="Email us">
+              <span class="chip-icon" set:html={icons.email}></span>
+              <span class="chip-text">
+                <span class="chip-label">Questions</span>
+                <span class="chip-value">spektraoslo@gmail.com</span>
+              </span>
+            </a>
+            <a class="contact-chip" href="https://www.instagram.com/grorud_cricket_klubb" target="_blank" rel="noopener" aria-label="Follow us on Instagram">
+              <span class="chip-icon" set:html={icons.instagram}></span>
+              <span class="chip-text">
+                <span class="chip-label">Follow</span>
+                <span class="chip-value">@grorud_cricket_klubb</span>
+              </span>
+            </a>
+          </div>
+
+          <a class="qr-card" href={registrationUrl} target="_blank" rel="noopener" aria-label="Open registration form">
+            <img src="/openday-qr.jpg" alt="QR code linking to the Open Day registration form" />
+            <div class="qr-label">
+              <span class="qr-title">Scan to register</span>
+              <span class="qr-sub">Point your camera →</span>
+            </div>
+          </a>
+        </div>
+        <div class="cta-poster">
+          <a href="/openday-poster.jpg" target="_blank" rel="noopener" aria-label="View full flyer">
+            <img src="/openday-poster.jpg" alt="GSCK Open Day flyer" />
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── LOCATION ───────────────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <div class="section-eyebrow">Location</div>
+      <h2 class="section-title">Rommen Mini, Oslo</h2>
+      <p class="od-sub">
+        Haavard Martinsens vei 35, 0978 Oslo — easy tram + bus access.
+      </p>
+      <div class="map">
+        <iframe
+          title="Map to Haavard Martinsens vei 35, 0978 Oslo"
+          src="https://www.google.com/maps?q=Haavard+Martinsens+vei+35,+0978+Oslo&output=embed"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+        ></iframe>
+      </div>
+      <p class="map-cta">
+        <a class="btn ghost" href="https://share.google/zTTNx78C1HcgClp6c" target="_blank" rel="noopener">
+          Open in Google Maps ↗
+        </a>
+      </p>
+    </div>
+  </section>
+</Layout>
+
+<script is:inline>
+  (function () {
+    const root = document.querySelector('[data-countdown]');
+    if (!root) return;
+    const target = new Date(root.getAttribute('data-target')).getTime();
+    const dEl = root.querySelector('[data-d]');
+    const hEl = root.querySelector('[data-h]');
+    const mEl = root.querySelector('[data-m]');
+    const sEl = root.querySelector('[data-s]');
+    const pad = (n) => String(n).padStart(2, '0');
+    function tick() {
+      const now = Date.now();
+      let diff = Math.max(0, Math.floor((target - now) / 1000));
+      const d = Math.floor(diff / 86400); diff -= d * 86400;
+      const h = Math.floor(diff / 3600);  diff -= h * 3600;
+      const m = Math.floor(diff / 60);    const s = diff - m * 60;
+      if (dEl) dEl.textContent = String(d);
+      if (hEl) hEl.textContent = pad(h);
+      if (mEl) mEl.textContent = pad(m);
+      if (sEl) sEl.textContent = pad(s);
+    }
+    tick();
+    setInterval(tick, 1000);
+  })();
+</script>
+
+<style>
+  /* ── Reused ─────────────────────────────────────────── */
+  .od-sub {
+    color: var(--gsck-mute);
+    max-width: 60ch;
+    font-size: 1.05rem;
+    margin-bottom: 2rem;
+  }
+
+  /* ── HERO ───────────────────────────────────────────── */
+  .od-hero {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(3rem, 8vw, 6rem) 0 clamp(4rem, 10vw, 7rem);
+    background:
+      radial-gradient(ellipse 60% 50% at 80% 20%, rgba(255, 101, 0, 0.15), transparent 70%),
+      radial-gradient(ellipse 50% 40% at 15% 80%, rgba(255, 101, 0, 0.10), transparent 70%);
+  }
+
+  .od-hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .grid-lines {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255, 101, 0, 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 101, 0, 0.045) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+  }
+  .dot {
+    position: absolute;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--gsck-orange);
+    opacity: 0.5;
+    filter: blur(0.5px);
+  }
+  .d1 { top: 12%; left: 6%;   animation: bob 5s ease-in-out infinite;   }
+  .d2 { top: 78%; left: 12%;  animation: bob 7s ease-in-out infinite reverse; }
+  .d3 { top: 18%; right: 20%; animation: bob 6s ease-in-out infinite;  }
+  .d4 { top: 82%; right: 8%;  animation: bob 4.5s ease-in-out infinite reverse; }
+  .d5 { top: 50%; left: 48%;  opacity: 0.25; animation: bob 8s ease-in-out infinite; }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-14px); }
+  }
+
+  .od-hero-inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  .pulse-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.5rem 1.1rem;
+    border-radius: 999px;
+    border: 1px solid var(--gsck-orange-soft);
+    background: var(--gsck-orange-dim);
+    color: var(--gsck-orange);
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .dot-live {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--gsck-orange);
+    animation: blink 1.3s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.15; }
+  }
+
+  h1 {
+    margin-top: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    line-height: 0.92;
+    letter-spacing: 0.03em;
+  }
+  h1 .over  {
+    font-size: clamp(1rem, 2vw, 1.4rem);
+    color: var(--gsck-mute);
+    font-family: var(--font-body);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 0.6rem;
+  }
+  h1 .main    { font-size: clamp(3rem, 8vw, 6rem);   color: var(--gsck-white); }
+  h1 .main em { font-style: normal; color: var(--gsck-orange); }
+  h1 .under   { font-size: clamp(2rem, 5vw, 3.4rem); color: var(--gsck-white); margin-top: 0.15em; }
+
+  .lead {
+    color: var(--gsck-mute);
+    font-size: clamp(1rem, 1.35vw, 1.1rem);
+    max-width: 50ch;
+    margin-top: 1.5rem;
+    line-height: 1.7;
+  }
+
+  .countdown {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    max-width: 480px;
+    margin: 1.75rem 0 1.5rem;
+  }
+  .cd-cell {
+    background: linear-gradient(180deg, rgba(255, 101, 0, 0.10), rgba(255, 101, 0, 0.02));
+    border: 1px solid var(--gsck-orange-soft);
+    border-radius: var(--radius-md);
+    padding: 0.9rem 0.5rem 0.75rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .cd-cell .n {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    line-height: 1;
+    color: var(--gsck-orange);
+    font-variant-numeric: tabular-nums;
+  }
+  .cd-cell .l {
+    font-size: 0.6rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gsck-mute);
+  }
+
+  .od-cta {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  /* Visual collage */
+  .od-hero-visual { display: flex; justify-content: center; }
+
+  .collage {
+    position: relative;
+    width: min(460px, 100%);
+    aspect-ratio: 1;
+  }
+  .tile {
+    position: absolute;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 3px solid var(--gsck-orange);
+    box-shadow: 0 20px 60px rgba(255, 101, 0, 0.25);
+  }
+  .tile-photo {
+    inset: 0 20% 30% 0;
+    animation: float 8s ease-in-out infinite;
+  }
+  .tile-illo {
+    right: 0; bottom: 0;
+    width: 62%; aspect-ratio: 1;
+    background: linear-gradient(135deg, #fff2e0, #ffd7a8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: float 8s ease-in-out infinite reverse;
+  }
+  .tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .tile-illo img { object-fit: contain; padding: 12px; }
+  .badge-float {
+    position: absolute;
+    left: -4%; bottom: 4%;
+    width: 22%; aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--gsck-black);
+    border: 3px solid var(--gsck-orange);
+    padding: 6px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 2;
+    animation: float 6s ease-in-out infinite;
+  }
+  .badge-float img {
+    width: 100%; height: 100%;
+    object-fit: contain; border-radius: 50%;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-10px); }
+  }
+
+  @media (max-width: 900px) {
+    .od-hero-inner { grid-template-columns: 1fr; }
+    .od-hero-visual { order: -1; }
+    .collage { max-width: 340px; margin-inline: auto; }
+  }
+
+  /* ── INFO STRIP ─────────────────────────────────────── */
+  .od-info {
+    padding: 0 0 2rem;
+    margin-top: -3rem;
+    position: relative;
+    z-index: 2;
+  }
+  .info-grid {
+    background: linear-gradient(180deg, rgba(247, 244, 238, 0.92), rgba(247, 244, 238, 0.78));
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--gsck-faint);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+  .info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+  }
+  .info-icon {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--gsck-orange-dim);
+    border: 1px solid var(--gsck-orange-soft);
+    display: grid; place-items: center;
+    color: var(--gsck-orange);
+    flex-shrink: 0;
+  }
+  .info-icon :global(svg) { width: 22px; height: 22px; }
+  .info-label {
+    color: var(--gsck-mute);
+    font-size: 0.65rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+  .info-value {
+    color: var(--gsck-white);
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  @media (max-width: 720px) {
+    .info-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 460px) {
+    .info-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ── EXPERIENCES ────────────────────────────────────── */
+  .exp-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  .exp-card {
+    background: linear-gradient(180deg, rgba(15, 15, 16, 0.04), rgba(15, 15, 16, 0.02));
+    border: 1px solid var(--gsck-faint);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+  }
+  .exp-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--gsck-orange-soft);
+    box-shadow: 0 10px 40px rgba(255, 101, 0, 0.12);
+  }
+  .exp-icon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    background: var(--gsck-orange);
+    color: var(--gsck-black);
+    display: grid; place-items: center;
+    margin-bottom: 0.35rem;
+    box-shadow: 0 6px 20px rgba(255, 101, 0, 0.35);
+  }
+  .exp-icon :global(svg) { width: 26px; height: 26px; }
+  .exp-card h3 { font-family: var(--font-display); font-size: 1.35rem; letter-spacing: 0.04em; }
+  .exp-card p  { color: var(--gsck-mute); font-size: 0.92rem; line-height: 1.6; }
+  @media (max-width: 900px) { .exp-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .exp-grid { grid-template-columns: 1fr; } }
+
+  /* ── WHO CAN JOIN ───────────────────────────────────── */
+  .who-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  .who-card {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--gsck-faint);
+    background: linear-gradient(180deg, rgba(15, 15, 16, 0.03), rgba(15, 15, 16, 0.01));
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .who-card:hover { border-color: var(--gsck-orange-soft); transform: translateY(-3px); }
+  .who-img {
+    aspect-ratio: 16 / 9;
+    background: linear-gradient(135deg, #ffe4c2, #ffb976);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .who-card.women .who-img { background: linear-gradient(135deg, #fff2e0, #ffd7a8); }
+  .who-img img { width: 100%; height: 100%; object-fit: cover; }
+  .who-card.women .who-img img { object-fit: cover; }
+  .who-text { padding: 1.5rem 1.75rem 1.75rem; }
+  .who-tag {
+    color: var(--gsck-orange);
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .who-text h3 { font-family: var(--font-display); font-size: 1.8rem; letter-spacing: 0.04em; margin: 0.3rem 0 0.6rem; }
+  .who-text p  { color: var(--gsck-mute); line-height: 1.7; }
+  @media (max-width: 760px) { .who-grid { grid-template-columns: 1fr; } }
+
+  /* ── CTA BANNER ─────────────────────────────────────── */
+  .cta-banner {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 2rem;
+    align-items: center;
+    background: linear-gradient(120deg, rgba(255, 101, 0, 0.12), rgba(255, 101, 0, 0.02) 60%);
+    border: 1px solid var(--gsck-orange-soft);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+  }
+  .cta-text h2 { font-size: clamp(2rem, 5vw, 3rem); margin: 0.35rem 0 0.6rem; }
+  .cta-text p  { color: var(--gsck-mute); max-width: 46ch; line-height: 1.65; }
+  .cta-actions { margin-top: 1.5rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .cta-tiny    { margin-top: 1.25rem; font-size: 0.8rem; color: var(--gsck-mute); }
+
+  .cta-contacts {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .contact-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 1rem 0.6rem 0.6rem;
+    background: rgba(15, 15, 16, 0.04);
+    border: 1px solid var(--gsck-faint);
+    border-radius: var(--radius-pill);
+    color: var(--gsck-white);
+    opacity: 1;
+    transition: transform 0.15s, border-color 0.15s, background 0.15s;
+  }
+
+  .contact-chip:hover {
+    transform: translateY(-2px);
+    border-color: var(--gsck-orange-soft);
+    background: var(--gsck-orange-dim);
+    opacity: 1;
+  }
+
+  .chip-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--gsck-orange);
+    color: var(--gsck-black);
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+  }
+  .chip-icon :global(svg) { width: 16px; height: 16px; }
+
+  .chip-text { display: flex; flex-direction: column; line-height: 1.1; }
+  .chip-label {
+    color: var(--gsck-mute);
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .chip-value {
+    color: var(--gsck-white);
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-top: 2px;
+  }
+  .qr-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.85rem 1.25rem 0.85rem 0.85rem;
+    margin-top: 1.5rem;
+    background: #ffffff;
+    color: var(--gsck-black);
+    border-radius: var(--radius-md);
+    box-shadow:
+      0 0 0 3px var(--gsck-orange),
+      0 20px 40px rgba(0, 0, 0, 0.4);
+    opacity: 1;
+    transition: transform 0.15s, box-shadow 0.15s;
+    align-self: flex-start;
+    max-width: fit-content;
+  }
+
+  .qr-card:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 0 0 3px var(--gsck-orange),
+      0 22px 50px rgba(255, 101, 0, 0.35);
+    opacity: 1;
+  }
+
+  .qr-card img {
+    width: 96px;
+    height: 96px;
+    display: block;
+    flex-shrink: 0;
+    background: #ffffff;
+    border-radius: 6px;
+  }
+
+  .qr-label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .qr-title {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    letter-spacing: 0.04em;
+    color: var(--gsck-black);
+    line-height: 1;
+  }
+
+  .qr-sub {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(0, 0, 0, 0.55);
+    font-weight: 600;
+  }
+
+  .cta-poster {
+    display: flex;
+    justify-content: center;
+  }
+
+  .cta-poster a {
+    display: block;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    opacity: 1;
+    transition: transform 0.2s;
+    width: 100%;
+  }
+
+  .cta-poster a:hover { transform: translateY(-3px); opacity: 1; }
+
+  .cta-poster img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  @media (max-width: 820px) {
+    .cta-banner { grid-template-columns: 1fr; }
+    .cta-poster { order: -1; }
+    .cta-poster a { max-width: 360px; margin: 0 auto; }
+  }
+
+  @media (max-width: 480px) {
+    .qr-card img { width: 84px; height: 84px; }
+    .qr-title { font-size: 1.15rem; }
+  }
+
+  /* ── MAP ────────────────────────────────────────────── */
+  .map {
+    aspect-ratio: 16 / 8;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--gsck-faint);
+    background: #111;
+  }
+  .map iframe { width: 100%; height: 100%; border: 0; filter: grayscale(30%) contrast(1.05); }
+  .map-cta { margin-top: 1rem; text-align: center; }
+</style>
