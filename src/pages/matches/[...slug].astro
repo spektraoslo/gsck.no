@@ -1,0 +1,215 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  const reports = await getCollection('reports');
+  return reports.map((r) => ({ params: { slug: r.id }, props: { report: r } }));
+}
+
+interface Props { report: CollectionEntry<'reports'>; }
+const { report } = Astro.props;
+const { Content } = await render(report);
+
+const dateFmt = (iso: string) =>
+  new Date(iso).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+---
+
+<Layout
+  title={`Match report — vs ${report.data.opponent}`}
+  description={`${report.data.league} match report: GSCK vs ${report.data.opponent}, ${dateFmt(report.data.matchDate)} — ${report.data.resultText}.`}
+>
+  <article class="section">
+    <div class="container">
+      <a class="back" href="/matches">← Back to Matches</a>
+
+      <header class="rpt-head">
+        <div class="section-eyebrow">{report.data.league} · {dateFmt(report.data.matchDate)}</div>
+        <h1 class="rpt-title">
+          <span class="rpt-vs">GSCK vs</span> {report.data.opponent}
+        </h1>
+
+        <div class="rpt-meta">
+          <span class:list={['outcome', report.data.result.toLowerCase()]}>{report.data.result}</span>
+          <span class="rpt-result">{report.data.resultText}</span>
+        </div>
+
+        {report.data.scoreSummary && (
+          <p class="rpt-score">{report.data.scoreSummary}</p>
+        )}
+        {report.data.venue && (
+          <p class="rpt-venue">at {report.data.venue}</p>
+        )}
+      </header>
+
+      <div class="rpt-body">
+        <Content />
+      </div>
+
+      {report.data.scorecardUrl && (
+        <p class="rpt-footer">
+          <a class="btn ghost" href={report.data.scorecardUrl} target="_blank" rel="noopener">
+            View full scorecard ↗
+          </a>
+        </p>
+      )}
+    </div>
+  </article>
+</Layout>
+
+<style>
+  .back {
+    display: inline-block;
+    color: var(--gsck-mute);
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    margin-bottom: 2rem;
+  }
+  .back:hover { color: var(--gsck-orange); opacity: 1; }
+
+  .rpt-head {
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--gsck-faint);
+    margin-bottom: 2.5rem;
+  }
+
+  .rpt-title {
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    line-height: 0.95;
+    margin: 0.4rem 0 1.25rem;
+  }
+  .rpt-vs {
+    color: var(--gsck-mute);
+    font-weight: 400;
+  }
+
+  .rpt-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .outcome {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    letter-spacing: 0.03em;
+    flex-shrink: 0;
+  }
+  .outcome.w  { background: var(--gsck-orange); color: var(--gsck-ink); box-shadow: 0 0 20px rgba(255,101,0,.35); }
+  .outcome.l  { background: rgba(15,15,16,.08); color: rgba(15,15,16,.75); border: 1px solid var(--gsck-faint); }
+  .outcome.nr { background: transparent; color: var(--gsck-mute); border: 1px dashed var(--gsck-faint); }
+
+  .rpt-result {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    letter-spacing: 0.03em;
+  }
+
+  .rpt-score {
+    color: var(--gsck-mute);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    font-variant-numeric: tabular-nums;
+    margin-top: 0.5rem;
+  }
+  .rpt-venue {
+    color: var(--gsck-mute);
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+  }
+
+  /* Long-form body — Markdown rendered content */
+  .rpt-body {
+    max-width: 68ch;
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: var(--gsck-ink);
+  }
+  .rpt-body :global(h2) {
+    font-family: var(--font-display);
+    font-size: 1.7rem;
+    letter-spacing: 0.04em;
+    color: var(--gsck-ink);
+    margin: 2.5rem 0 0.75rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--gsck-faint);
+  }
+  .rpt-body :global(h2:first-child) { border-top: none; padding-top: 0; margin-top: 0; }
+  .rpt-body :global(h3) {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    letter-spacing: 0.04em;
+    margin: 1.5rem 0 0.4rem;
+  }
+  .rpt-body :global(p) { margin-bottom: 1.1rem; color: var(--gsck-ink); }
+  .rpt-body :global(em) { color: var(--gsck-mute); }
+  .rpt-body :global(strong) { color: var(--gsck-ink); font-weight: 700; }
+  .rpt-body :global(ul), .rpt-body :global(ol) {
+    padding-left: 1.4rem;
+    margin-bottom: 1.1rem;
+  }
+  .rpt-body :global(li) { margin-bottom: 0.4rem; }
+  .rpt-body :global(blockquote) {
+    border-left: 3px solid var(--gsck-orange);
+    padding: 0.4rem 0 0.4rem 1.25rem;
+    color: var(--gsck-ink);
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    letter-spacing: 0.04em;
+    margin: 2rem 0;
+  }
+
+  /* Markdown tables — scorecard "Best Performances" */
+  .rpt-body :global(table) {
+    width: 100%;
+    max-width: none;
+    border-collapse: collapse;
+    margin: 1.25rem 0 2rem;
+    font-size: 0.9rem;
+    background: var(--gsck-cream-warm);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+  .rpt-body :global(thead) {
+    background: rgba(255, 101, 0, 0.08);
+  }
+  .rpt-body :global(th) {
+    text-align: left;
+    padding: 0.65rem 0.9rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gsck-orange);
+    font-weight: 700;
+    border-bottom: 1px solid var(--gsck-orange-soft);
+  }
+  .rpt-body :global(th:not(:first-child)),
+  .rpt-body :global(td:not(:first-child)) {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .rpt-body :global(td) {
+    padding: 0.65rem 0.9rem;
+    border-bottom: 1px solid var(--gsck-faint);
+    color: var(--gsck-ink);
+  }
+  .rpt-body :global(tr:last-child td) {
+    border-bottom: none;
+  }
+  .rpt-body :global(tbody tr:hover) {
+    background: rgba(255, 101, 0, 0.05);
+  }
+
+  .rpt-footer {
+    margin-top: 3rem;
+    text-align: center;
+  }
+</style>

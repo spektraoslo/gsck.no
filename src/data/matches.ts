@@ -27,13 +27,14 @@ const GSCK = 'Grorud cricket klubb';
 
 // ── 2026 Super League — Qualifying A ───────────────────────
 export const superLeagueMatches: Match[] = [
-  { sno: 1, matchType: 'League', date: '2026-07-25', teamOne: 'Strømsø B',    teamTwo: GSCK,          result: 'Abandoned.',                                    scoreSummary: 'Strømsø B: 83/3(10.0)' },
-  { sno: 2, matchType: 'League', date: '2026-07-21', teamOne: 'Strømmen B',   teamTwo: GSCK,          result: 'Grorud cricket klubb won by 4 Wickets',         scoreSummary: 'Strømmen B: 144/8(20.0)Grorud cricket klubb: 145/6(18.4)' },
-  { sno: 3, matchType: 'League', date: '2026-07-03', teamOne: 'Minhaj B',     teamTwo: GSCK,          result: 'Grorud cricket klubb won by 10 Wickets (D/L)',  scoreSummary: 'Minhaj B: 106/8(20.0)Grorud cricket klubb: 85/0(5.3)' },
-  { sno: 4, matchType: 'League', date: '2026-06-26', teamOne: GSCK,           teamTwo: 'Kringsjå',    result: 'Grorud cricket klubb won by 5 Runs',            scoreSummary: 'Grorud cricket klubb: 157/9(20.0)Kringsjå: 152/7(20.0)' },
-  { sno: 5, matchType: 'League', date: '2026-06-09', teamOne: GSCK,           teamTwo: 'Asker',       result: 'Asker won by 1 Run (D/L)',                      scoreSummary: 'Grorud cricket klubb: 108/6(14.0)Asker: 109/8(14.0)' },
-  { sno: 6, matchType: 'League', date: '2026-05-24', teamOne: GSCK,           teamTwo: 'Helsfyr',     result: 'Grorud cricket klubb won by 93 Runs',           scoreSummary: 'Grorud cricket klubb: 176/8(20.0)Helsfyr: 83/10(11.5)' },
-  { sno: 7, matchType: 'League', date: '2026-05-13', teamOne: 'Fjord C',      teamTwo: GSCK,          result: 'Grorud cricket klubb won by 2 Wickets',         scoreSummary: 'Fjord C: 150/6(20.0)Grorud cricket klubb: 151/8(19.2)' },
+  { sno: 1, matchType: 'League', date: '2026-08-08', teamOne: 'Drammen B CK', teamTwo: GSCK,          result: 'Grorud cricket klubb won by 7 Wickets',         scoreSummary: 'Drammen B CK: 112/8(20.0)Grorud cricket klubb: 113/3(11.3)' },
+  { sno: 2, matchType: 'League', date: '2026-07-25', teamOne: 'Strømsø B',    teamTwo: GSCK,          result: 'Abandoned.',                                    scoreSummary: 'Strømsø B: 83/3(10.0)' },
+  { sno: 3, matchType: 'League', date: '2026-07-21', teamOne: 'Strømmen B',   teamTwo: GSCK,          result: 'Grorud cricket klubb won by 4 Wickets',         scoreSummary: 'Strømmen B: 144/8(20.0)Grorud cricket klubb: 145/6(18.4)' },
+  { sno: 4, matchType: 'League', date: '2026-07-03', teamOne: 'Minhaj B',     teamTwo: GSCK,          result: 'Grorud cricket klubb won by 10 Wickets (D/L)',  scoreSummary: 'Minhaj B: 106/8(20.0)Grorud cricket klubb: 85/0(5.3)' },
+  { sno: 5, matchType: 'League', date: '2026-06-26', teamOne: GSCK,           teamTwo: 'Kringsjå',    result: 'Grorud cricket klubb won by 5 Runs',            scoreSummary: 'Grorud cricket klubb: 157/9(20.0)Kringsjå: 152/7(20.0)' },
+  { sno: 6, matchType: 'League', date: '2026-06-09', teamOne: GSCK,           teamTwo: 'Asker',       result: 'Asker won by 1 Run (D/L)',                      scoreSummary: 'Grorud cricket klubb: 108/6(14.0)Asker: 109/8(14.0)' },
+  { sno: 7, matchType: 'League', date: '2026-05-24', teamOne: GSCK,           teamTwo: 'Helsfyr',     result: 'Grorud cricket klubb won by 93 Runs',           scoreSummary: 'Grorud cricket klubb: 176/8(20.0)Helsfyr: 83/10(11.5)' },
+  { sno: 8, matchType: 'League', date: '2026-05-13', teamOne: 'Fjord C',      teamTwo: GSCK,          result: 'Grorud cricket klubb won by 2 Wickets',         scoreSummary: 'Fjord C: 150/6(20.0)Grorud cricket klubb: 151/8(19.2)' },
 ];
 
 // ── 2026 T20 League — Qualifying B ─────────────────────────
@@ -112,9 +113,9 @@ export interface GsckStanding {
 }
 
 export const gsckSuperLeagueStanding: GsckStanding = {
-  position: 3,
+  position: 2,
   totalTeams: 10,
-  netRr: 1.8161,
+  netRr: 2.1206,
 };
 
 export const gsckT20Standing: GsckStanding = {

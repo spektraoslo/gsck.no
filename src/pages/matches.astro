@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
 import {
   superLeagueMatches,
   t20Matches,
@@ -13,6 +14,17 @@ import {
   ordinal,
   type Match,
 } from '../data/matches';
+
+// Load match reports and index by (date + opponent) for cross-linking.
+const reports = await getCollection('reports');
+type Report = CollectionEntry<'reports'>;
+
+function findReport(m: Match): Report | undefined {
+  const opponent = isGSCK(m.teamOne) ? m.teamTwo : m.teamOne;
+  return reports.find(
+    (r) => r.data.matchDate === m.date && r.data.opponent === opponent,
+  );
+}
 
 const superStats = computeStats(superLeagueMatches);
 const t20Stats = computeStats(t20Matches);
@@ -41,10 +53,18 @@ const leagues = [
         Super League (Qualifying&nbsp;A) and T20 League (Qualifying&nbsp;B).
       </p>
 
-      <!-- Season summary cards -->
-      <div class="summary">
-        {leagues.map((l) => (
-          <article class="summary-card">
+      <!-- Season summary cards — also act as league tabs -->
+      <div class="summary" role="tablist" aria-label="League selector">
+        {leagues.map((l, idx) => (
+          <article
+            class:list={['summary-card', { active: idx === 0 }]}
+            role="tab"
+            tabindex={idx === 0 ? 0 : -1}
+            aria-selected={idx === 0 ? 'true' : 'false'}
+            aria-controls={`panel-${l.key}`}
+            id={`tab-${l.key}`}
+            data-tab={l.key}
+          >
             <header>
               <div class="sc-heading">
                 <div class="sc-league">{l.name}</div>
@@ -80,12 +100,19 @@ const leagues = [
         ))}
       </div>
 
-      <!-- Match lists per league -->
-      {leagues.map((l) => (
-        <section class="league-block">
-          <h2 class="league-title">
-            {l.name}
-            <span class="league-title-sub">{l.sub}</span>
+      <!-- Match lists per league (tabpanels, one visible at a time) -->
+      {leagues.map((l, idx) => (
+        <section
+          class="league-panel"
+          id={`panel-${l.key}`}
+          role="tabpanel"
+          aria-labelledby={`tab-${l.key}`}
+          data-panel={l.key}
+          hidden={idx !== 0}
+        >
+          <h2 class="panel-heading">
+            <span class="panel-heading-main">{l.name}</span>
+            <span class="panel-heading-sub">{l.sub} · {l.matches.length} matches</span>
           </h2>
 
           <ul class="match-list">
@@ -118,6 +145,12 @@ const leagues = [
                   </div>
 
                   <div class="match-result">{m.result}</div>
+
+                  {findReport(m) && (
+                    <a class="report-link" href={`/matches/${findReport(m)!.id}`}>
+                      Read match report →
+                    </a>
+                  )}
                 </li>
               );
             })}
@@ -146,10 +179,41 @@ const leagues = [
   }
 
   .summary-card {
+    position: relative;
     background: linear-gradient(180deg, rgba(255, 101, 0, 0.06), rgba(15, 15, 16, 0.02));
     border: 1px solid var(--gsck-orange-soft);
     border-radius: var(--radius-lg);
     padding: 1.5rem;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.2s, border-color 0.2s, opacity 0.2s;
+    opacity: 0.72;
+  }
+  .summary-card:hover {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+  .summary-card:focus-visible {
+    outline: 3px solid var(--gsck-orange);
+    outline-offset: 3px;
+  }
+
+  .summary-card.active {
+    opacity: 1;
+    border-color: var(--gsck-orange);
+    border-width: 2px;
+    padding: calc(1.5rem - 1px); /* keep size the same when border thickens */
+    box-shadow: 0 15px 45px rgba(255, 101, 0, 0.20);
+  }
+
+  /* Bottom "connector" strip on the active card — visually links to the panel below */
+  .summary-card.active::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -14px;
+    transform: translateX(-50%);
+    border: 8px solid transparent;
+    border-top-color: var(--gsck-orange);
   }
 
   .summary-card header {
@@ -306,26 +370,32 @@ const leagues = [
   .pip.l  { background: rgba(15, 15, 16, 0.08); color: rgba(15, 15, 16, 0.55); border: 1px solid var(--gsck-faint); }
   .pip.nr { background: transparent; color: var(--gsck-mute); border: 1px solid var(--gsck-faint); }
 
-  /* ── League blocks ─────────────────────────── */
-  .league-block { margin-top: 3rem; }
-  .league-block:first-of-type { margin-top: 0; }
+  /* ── League panel (shown when its card is active) ── */
+  .league-panel {
+    margin-top: 2rem;
+  }
+  .league-panel[hidden] { display: none; }
 
-  .league-title {
-    font-family: var(--font-display);
-    font-size: 2rem;
-    letter-spacing: 0.05em;
-    margin-bottom: 1.25rem;
+  .panel-heading {
     display: flex;
     align-items: baseline;
     gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--gsck-faint);
   }
-
-  .league-title-sub {
+  .panel-heading-main {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3vw, 2rem);
+    letter-spacing: 0.05em;
+    color: var(--gsck-ink);
+  }
+  .panel-heading-sub {
     color: var(--gsck-mute);
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    font-family: var(--font-body);
     font-weight: 500;
   }
 
@@ -424,6 +494,21 @@ const leagues = [
     letter-spacing: 0.03em;
   }
 
+  .report-link {
+    display: inline-block;
+    margin-top: 0.85rem;
+    color: var(--gsck-orange);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: transform 0.15s;
+  }
+  .report-link:hover {
+    opacity: 1;
+    transform: translateX(3px);
+  }
+
   .footnote {
     margin-top: 3rem;
     color: var(--gsck-mute);
@@ -436,6 +521,54 @@ const leagues = [
     .summary { grid-template-columns: 1fr; }
     .sc-stats { grid-template-columns: repeat(3, 1fr); row-gap: 1rem; }
     .stat.points::before { display: none; }
-    .league-title { font-size: 1.6rem; }
+    /* Hide the arrow "connector" on stacked mobile layout — points nowhere useful */
+    .summary-card.active::after { display: none; }
   }
 </style>
+
+<script is:inline>
+  (function () {
+    const tabs = Array.from(document.querySelectorAll('[data-tab]'));
+    const panels = Array.from(document.querySelectorAll('[data-panel]'));
+
+    function activate(key, focus) {
+      tabs.forEach((t) => {
+        const on = t.dataset.tab === key;
+        t.classList.toggle('active', on);
+        t.setAttribute('aria-selected', String(on));
+        t.setAttribute('tabindex', on ? '0' : '-1');
+        if (on && focus) t.focus();
+      });
+      panels.forEach((p) => {
+        p.hidden = p.dataset.panel !== key;
+      });
+      if (location.hash.replace('#', '') !== key) {
+        history.replaceState(null, '', '#' + key);
+      }
+    }
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => activate(tab.dataset.tab));
+      tab.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          activate(tab.dataset.tab);
+        }
+        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+          e.preventDefault();
+          const idx = tabs.indexOf(tab);
+          const nextIdx = e.key === 'ArrowRight'
+            ? (idx + 1) % tabs.length
+            : (idx - 1 + tabs.length) % tabs.length;
+          activate(tabs[nextIdx].dataset.tab, true);
+        }
+      });
+    });
+
+    // Deep-link support: /matches#t20 or /matches#super
+    const initial = location.hash.replace('#', '');
+    if (initial && tabs.some((t) => t.dataset.tab === initial)) {
+      activate(initial);
+    }
+  })();
+</script>

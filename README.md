@@ -21,12 +21,15 @@ gsck.no/
 ├── public/                         ← Static assets served as-is (images, video, CNAME)
 ├── src/
 │   ├── components/                 ← Header.astro, Footer.astro
+│   ├── content/reports/            ← One markdown file per match report
+│   ├── content.config.ts           ← Content collection schema for reports
 │   ├── data/                       ← players.ts, matches.ts (typed source data)
 │   ├── layouts/Layout.astro        ← Shared HTML shell (fonts, header, footer)
 │   ├── pages/                      ← One .astro file per route
 │   │   ├── index.astro             ← /
 │   │   ├── team.astro              ← /team
-│   │   ├── matches.astro           ← /matches
+│   │   ├── matches.astro           ← /matches   (Super League / T20 tabs)
+│   │   ├── matches/[...slug].astro ← /matches/<slug>   (per-match report)
 │   │   ├── gallery.astro           ← /gallery
 │   │   ├── nets.astro              ← /nets
 │   │   ├── open-day.astro          ← /open-day
@@ -82,7 +85,8 @@ The site is served at [www.gsck.no](https://www.gsck.no) via the `CNAME` file in
 Most changes are one-file edits:
 
 - **Rosters** — `src/data/players.ts` (add / remove / rename players, update captain / vice-captain)
-- **Match results + GSCK standing** — `src/data/matches.ts`
+- **Match results + GSCK standing** — `src/data/matches.ts` (add a new entry to `superLeagueMatches` or `t20Matches`; update `gsckSuperLeagueStanding` / `gsckT20Standing` after each new points table)
+- **Match reports** — add a new markdown file at `src/content/reports/YYYY-MM-DD-vs-<opponent-slug>.md`. Frontmatter must include `matchDate`, `league`, `opponent` (matching the entry in `matches.ts` exactly), `result`, `resultText`, and optionally `scoreSummary`, `venue`. Body is free-form markdown — see any existing report for the format. The report is auto-linked from the Matches page.
 - **Nets schedule** — `src/pages/nets.astro` (`sessions` array at the top)
 - **Open Day details** — `src/pages/open-day.astro` (event date, registration URL, poster, QR)
 - **Home copy** — `src/pages/index.astro`

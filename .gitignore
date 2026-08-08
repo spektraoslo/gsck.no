@@ -22,3 +22,6 @@ pnpm-debug.log*
 # editors
 .idea/
 .vscode/
+
+# local-only preview artifacts (Playwright screenshots + videos)
+site-preview/
