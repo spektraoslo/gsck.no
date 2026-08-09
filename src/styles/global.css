@@ -10,6 +10,7 @@
   --gsck-cream-deep:  #E8DEC5;   /* subtle sections */
   --gsck-ink:         #0F0F10;   /* body text / dark contrast */
   --gsck-orange:      #FF6500;   /* primary accent */
+  --gsck-orange-dark: #D94A00;   /* darker orange for hover / pressed states */
   --gsck-orange-dim:  rgba(255, 101, 0, 0.10);
   --gsck-orange-soft: rgba(255, 101, 0, 0.40);
   --gsck-green:       #1F5A3A;   /* pitch green, secondary */
@@ -115,13 +116,19 @@ h1, h2, h3, h4 {
   text-transform: uppercase;
   border: none;
   cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition: background 0.15s, color 0.15s, transform 0.15s, box-shadow 0.2s, border-color 0.15s;
 }
 
 .btn:hover {
+  background: var(--gsck-orange-dark);
   transform: translateY(-1px);
-  box-shadow: var(--shadow-glow);
+  box-shadow: 0 10px 24px rgba(217, 74, 0, 0.35);
   opacity: 1;
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(217, 74, 0, 0.30);
 }
 
 .btn.ghost {
@@ -131,8 +138,10 @@ h1, h2, h3, h4 {
 }
 
 .btn.ghost:hover {
-  background: var(--gsck-orange-dim);
-  box-shadow: none;
+  background: var(--gsck-orange);
+  color: var(--on-orange);
+  border-color: var(--gsck-orange);
+  box-shadow: 0 8px 20px rgba(255, 101, 0, 0.28);
 }
 
 /* Section headings */

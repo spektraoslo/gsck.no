@@ -189,14 +189,20 @@ const infoStrip = [
             Spaces are open to everyone — just tell us who's coming. Registration takes
             under a minute.
           </p>
-          <p class="cta-actions">
-            <a class="btn" href={registrationUrl} target="_blank" rel="noopener">
+          <div class="cta-choice">
+            <a class="btn cta-register" href={registrationUrl} target="_blank" rel="noopener">
               Register now
             </a>
-            <a class="btn ghost" href="mailto:spektraoslo@gmail.com">
-              Ask a question
-            </a>
-          </p>
+            <span class="cta-or" aria-hidden="true">or</span>
+            <div class="qr-card">
+              <img src="/openday-qr.jpg" alt="QR code linking to the Open Day registration form" />
+              <div class="qr-label">
+                <span class="qr-title">Scan to register</span>
+                <span class="qr-sub">Point your camera →</span>
+              </div>
+            </div>
+          </div>
+
           <div class="cta-contacts">
             <a class="contact-chip" href="mailto:spektraoslo@gmail.com" aria-label="Email us">
               <span class="chip-icon" set:html={icons.email}></span>
@@ -213,14 +219,6 @@ const infoStrip = [
               </span>
             </a>
           </div>
-
-          <a class="qr-card" href={registrationUrl} target="_blank" rel="noopener" aria-label="Open registration form">
-            <img src="/openday-qr.jpg" alt="QR code linking to the Open Day registration form" />
-            <div class="qr-label">
-              <span class="qr-title">Scan to register</span>
-              <span class="qr-sub">Point your camera →</span>
-            </div>
-          </a>
         </div>
         <div class="cta-poster">
           <a href="/openday-poster.jpg" target="_blank" rel="noopener" aria-label="View full flyer">
@@ -629,6 +627,44 @@ const infoStrip = [
   .cta-actions { margin-top: 1.5rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
   .cta-tiny    { margin-top: 1.25rem; font-size: 0.8rem; color: var(--gsck-mute); }
 
+  /* Register button + QR card side-by-side with an OR divider */
+  .cta-choice {
+    margin-top: 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+  }
+  .cta-register { flex-shrink: 0; }
+
+  .cta-or {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gsck-mute);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    padding: 0 0.5rem;
+    position: relative;
+  }
+  .cta-or::before,
+  .cta-or::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 22px;
+    background: var(--gsck-faint);
+  }
+  .cta-or::before { top: -28px; }
+  .cta-or::after  { bottom: -28px; }
+
+  /* Ensure QR card doesn't stretch the row on wrap */
+  .cta-choice .qr-card { margin-top: 0; }
+
   .cta-contacts {
     margin-top: 1.5rem;
     display: flex;
@@ -691,21 +727,10 @@ const infoStrip = [
     background: #ffffff;
     color: var(--gsck-black);
     border-radius: var(--radius-md);
-    box-shadow:
-      0 0 0 3px var(--gsck-orange),
-      0 20px 40px rgba(0, 0, 0, 0.4);
-    opacity: 1;
-    transition: transform 0.15s, box-shadow 0.15s;
+    border: 1px solid var(--gsck-faint);
+    box-shadow: 0 8px 24px rgba(15, 15, 16, 0.10);
     align-self: flex-start;
     max-width: fit-content;
-  }
-
-  .qr-card:hover {
-    transform: translateY(-2px);
-    box-shadow:
-      0 0 0 3px var(--gsck-orange),
-      0 22px 50px rgba(255, 101, 0, 0.35);
-    opacity: 1;
   }
 
   .qr-card img {
