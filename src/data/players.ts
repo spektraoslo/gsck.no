@@ -25,6 +25,7 @@ export const players: Player[] = [
   { name: 'Lineesh Puthiyotttum Kandi',   leagues: ['Super League', 'T20 League'] },
   { name: 'Mahaboob Veettilayil Monutty', leagues: ['Super League', 'T20 League'] },
   { name: 'Mahesh Das',                   leagues: ['Super League', 'T20 League'] },
+  { name: 'Midhun Mohan',                 leagues: ['Super League', 'T20 League'] },
   { name: 'Nithin Chekkattu Nandan',      leagues: ['Super League', 'T20 League'] },
   {
     name: 'Rahul Kuppakkattu Kaladharan',
