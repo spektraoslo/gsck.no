@@ -1,0 +1,233 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const sessions = [
+  {
+    kind: 'indoor',
+    label: 'Indoor Nets',
+    day: 'Saturday',
+    startTime: '09:00',
+    endTime: '11:00',
+    venue: 'Jerikoveien 20, 1067 Oslo',
+    mapUrl: 'https://share.google/swbHbI3goloJYcOXN',
+  },
+  {
+    kind: 'outdoor',
+    label: 'Outdoor Nets',
+    day: 'Friday',
+    startTime: '17:00',
+    endTime: '19:00',
+    venue: 'Ekeberg Cricket Practice Net',
+    mapUrl: 'https://maps.app.goo.gl/DzozzFWj7QK4RgVZA',
+  },
+] as const;
+
+const icons: Record<string, string> = {
+  indoor: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11L12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>`,
+  outdoor: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>`,
+  calendar: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>`,
+  clock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>`,
+  pin: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s-7-7.5-7-13a7 7 0 0 1 14 0c0 5.5-7 13-7 13z"/><circle cx="12" cy="9" r="2.5"/></svg>`,
+};
+---
+
+<Layout title="Nets Sessions">
+  <section class="section">
+    <div class="container">
+      <div class="section-eyebrow">Training</div>
+      <h1 class="section-title">Nets Sessions</h1>
+      <p class="lede">
+        Weekly indoor and outdoor practice. All skill levels welcome.
+      </p>
+
+      <div class="nets-grid">
+        {sessions.map((s) => (
+          <article class:list={['net-card', s.kind]}>
+            <header class="net-head">
+              <div class="head-icon" set:html={icons[s.kind]}></div>
+              <div class="head-text">
+                <span class="head-kind">{s.kind === 'indoor' ? 'Indoor' : 'Outdoor'}</span>
+                <h2>{s.label}</h2>
+              </div>
+            </header>
+
+            <ul class="net-details">
+              <li>
+                <span class="det-icon" set:html={icons.calendar}></span>
+                <span class="det-body">
+                  <span class="det-label">Day</span>
+                  <span class="det-value">Every {s.day}</span>
+                </span>
+              </li>
+              <li>
+                <span class="det-icon" set:html={icons.clock}></span>
+                <span class="det-body">
+                  <span class="det-label">Time</span>
+                  <span class="det-value time">
+                    <strong>{s.startTime}</strong>
+                    <span class="sep">–</span>
+                    <strong>{s.endTime}</strong>
+                  </span>
+                </span>
+              </li>
+              <li>
+                <span class="det-icon" set:html={icons.pin}></span>
+                <span class="det-body">
+                  <span class="det-label">Venue</span>
+                  <span class="det-value">{s.venue}</span>
+                </span>
+              </li>
+            </ul>
+
+            <a class="btn ghost net-cta" href={s.mapUrl} target="_blank" rel="noopener">
+              Open in Google Maps ↗
+            </a>
+          </article>
+        ))}
+      </div>
+
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .lede {
+    color: var(--gsck-mute);
+    max-width: 60ch;
+    font-size: 1.05rem;
+    margin-top: 0.5rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .nets-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  .net-card {
+    padding: 1.75rem;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(180deg, rgba(15, 15, 16, 0.04), rgba(15, 15, 16, 0.02));
+    border: 1px solid var(--gsck-faint);
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  }
+  .net-card:hover {
+    border-color: var(--gsck-orange-soft);
+    transform: translateY(-3px);
+    box-shadow: 0 15px 45px rgba(255, 101, 0, 0.12);
+  }
+  .net-card.indoor {
+    background:
+      radial-gradient(ellipse 100% 60% at 100% 0%, rgba(255, 101, 0, 0.08), transparent 70%),
+      linear-gradient(180deg, rgba(15, 15, 16, 0.04), rgba(15, 15, 16, 0.02));
+  }
+  .net-card.outdoor {
+    background:
+      radial-gradient(ellipse 100% 60% at 0% 0%, rgba(255, 101, 0, 0.08), transparent 70%),
+      linear-gradient(180deg, rgba(15, 15, 16, 0.04), rgba(15, 15, 16, 0.02));
+  }
+
+  .net-head {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 1.25rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid var(--gsck-faint);
+  }
+  .head-icon {
+    width: 56px; height: 56px;
+    border-radius: 16px;
+    background: var(--gsck-orange);
+    color: var(--gsck-black);
+    display: grid; place-items: center;
+    box-shadow: 0 6px 20px rgba(255, 101, 0, 0.35);
+    flex-shrink: 0;
+  }
+  .head-icon :global(svg) { width: 28px; height: 28px; }
+
+  .head-text { display: flex; flex-direction: column; gap: 4px; }
+  .head-kind {
+    color: var(--gsck-orange);
+    font-size: 0.65rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .head-text h2 {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+
+  .net-details {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem;
+    display: grid;
+    gap: 1rem;
+  }
+  .net-details li {
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    gap: 0.85rem;
+    align-items: center;
+  }
+  .det-icon {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--gsck-orange-dim);
+    border: 1px solid var(--gsck-orange-soft);
+    color: var(--gsck-orange);
+    display: grid; place-items: center;
+  }
+  .det-icon :global(svg) { width: 18px; height: 18px; }
+  .det-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .det-label {
+    color: var(--gsck-mute);
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .det-value {
+    color: var(--gsck-white);
+    font-size: 1rem;
+    font-weight: 500;
+  }
+  .det-value.time {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    letter-spacing: 0.03em;
+    line-height: 1;
+    color: var(--gsck-orange);
+    font-variant-numeric: tabular-nums;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .det-value.time .sep {
+    color: var(--gsck-mute);
+    font-size: 1.2rem;
+  }
+
+  .net-cta {
+    margin-top: auto;
+    justify-content: center;
+  }
+
+  .footnote {
+    margin-top: 2.5rem;
+    color: var(--gsck-mute);
+    font-size: 0.85rem;
+    text-align: center;
+  }
+
+  @media (max-width: 760px) {
+    .nets-grid { grid-template-columns: 1fr; }
+  }
+</style>

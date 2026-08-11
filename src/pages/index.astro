@@ -1,0 +1,328 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Home">
+  <!-- Hero -->
+  <section class="hero">
+    <div class="stripes" aria-hidden="true">
+      <div class="stripe s1"></div>
+      <div class="stripe s2"></div>
+      <div class="stripe s3"></div>
+    </div>
+    <div class="glow" aria-hidden="true"></div>
+
+    <div class="container hero-inner">
+      <div class="hero-text">
+        <span class="eyebrow">Oslo · Norway · Est. 2026</span>
+        <h1>Grorud Spektra<br /><em>Cricket Klubb</em></h1>
+        <p class="lead">
+          Established in 2026 — a social cricket club based in Oslo, playing in the
+          Norwegian Cricket Federation Super League and T20 League. Team spirit first,
+          open to all.
+        </p>
+        <div class="hero-cta">
+          <a class="btn" href="/open-day">Open Day — 16 Aug 2026</a>
+          <a class="btn ghost" href="/team">Meet the Squad</a>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="photo-ring">
+          <img src="/team-hero.jpg" alt="GSCK squad celebrating a win" />
+        </div>
+        <div class="badge-chip" aria-hidden="true">
+          <img src="/gsck-logo.png" alt="" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Highlights -->
+  <section class="section">
+    <div class="container">
+      <div class="highlights">
+        <a class="card highlight" href="/open-day">
+          <span class="tag">Upcoming Event</span>
+          <h3>Open Day for Kids &amp; Women</h3>
+          <p>16 August 2026 · 14:00 – 19:00 · Rommen Mini, Oslo</p>
+          <span class="arrow">Register →</span>
+        </a>
+
+        <a class="card highlight" href="/team">
+          <span class="tag">Squads</span>
+          <h3>2026 Super League &amp; T20</h3>
+          <p>Two competitive squads representing GSCK in the Norwegian Cricket Federation.</p>
+          <span class="arrow">See players →</span>
+        </a>
+
+        <a class="card highlight" href="/nets">
+          <span class="tag">Training</span>
+          <h3>Indoor &amp; Outdoor Nets</h3>
+          <p>Regular training sessions all season. All skill levels welcome.</p>
+          <span class="arrow">Schedule →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Who We Are -->
+  <section class="section who">
+    <div class="container">
+      <div class="section-eyebrow">About us</div>
+      <h2 class="section-title">Who We Are</h2>
+      <div class="who-body">
+        <p>
+          GSCK is a brand-new club — we started in 2026. What began as friends
+          looking for more games has grown into two squads in the Norwegian Cricket
+          Federation, weekly nets across Oslo, and open days for kids and women
+          stepping onto a cricket ground for the first time.
+        </p>
+        <p>
+          No hundred-year history here. Just a group of people building an Oslo
+          cricket club from scratch — one match, one training session, one new
+          player at a time.
+        </p>
+        <p class="who-pull">Whoever you are, whatever your level — there's a spot for you at GSCK.</p>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(3rem, 8vw, 6rem) 0 clamp(4rem, 10vw, 8rem);
+  }
+
+  .stripes {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .stripe {
+    position: absolute;
+    left: -60%;
+    width: 220%;
+    transform: rotate(-32deg);
+    transform-origin: left center;
+  }
+  .s1 { top: 8%;  height: 80px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,101,0,.14) 50%, transparent 100%);
+  }
+  .s2 { top: 42%; height: 26px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,101,0,.08) 50%, transparent 100%);
+  }
+  .s3 { top: 72%; height: 100px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,101,0,.10) 50%, transparent 100%);
+  }
+
+  .glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 55% at 70% 40%, rgba(255,101,0,.10) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .hero-inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  .eyebrow {
+    display: inline-block;
+    color: var(--gsck-orange);
+    font-size: 0.75rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    margin-bottom: 1.25rem;
+    font-weight: 600;
+  }
+
+  h1 {
+    font-size: clamp(3rem, 9vw, 6rem);
+    line-height: 0.92;
+    letter-spacing: 0.03em;
+  }
+
+  h1 em {
+    color: var(--gsck-orange);
+    font-style: normal;
+  }
+
+  .lead {
+    color: var(--gsck-mute);
+    font-size: clamp(1rem, 1.5vw, 1.15rem);
+    max-width: 46ch;
+    margin-top: 1.5rem;
+    line-height: 1.7;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .hero-visual {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1;
+    max-width: 460px;
+    margin-inline: auto;
+    animation: float 8s ease-in-out infinite;
+  }
+
+  .photo-ring {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--gsck-orange);
+    box-shadow:
+      0 0 0 8px rgba(255, 101, 0, 0.08),
+      0 20px 80px rgba(255, 101, 0, 0.35),
+      inset 0 0 40px rgba(0, 0, 0, 0.35);
+  }
+
+  .photo-ring::after {
+    /* subtle inner vignette so the orange ring pops */
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle at center, transparent 55%, rgba(8, 8, 8, 0.35) 100%);
+    pointer-events: none;
+  }
+
+  .photo-ring img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 30%;
+  }
+
+  .badge-chip {
+    position: absolute;
+    right: -6%;
+    bottom: 4%;
+    width: 26%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--gsck-black);
+    border: 3px solid var(--gsck-orange);
+    padding: 6px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .badge-chip img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-10px); }
+  }
+
+  @media (max-width: 900px) {
+    .hero-inner {
+      grid-template-columns: 1fr;
+      text-align: left;
+    }
+    .hero-visual {
+      order: -1;
+      max-width: 300px;
+    }
+  }
+
+  /* Highlights */
+  .highlights {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+  }
+
+  .highlight {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    color: var(--gsck-white);
+    opacity: 1;
+    transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .highlight:hover {
+    transform: translateY(-3px);
+    border-color: var(--gsck-orange-soft);
+    box-shadow: 0 10px 40px rgba(255, 101, 0, 0.12);
+  }
+
+  .tag {
+    color: var(--gsck-orange);
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .highlight h3 {
+    font-size: 1.7rem;
+    line-height: 1.05;
+  }
+
+  .highlight p {
+    color: var(--gsck-mute);
+    font-size: 0.95rem;
+  }
+
+  .arrow {
+    margin-top: auto;
+    color: var(--gsck-orange);
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+  }
+
+  @media (max-width: 900px) {
+    .highlights {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Who We Are */
+  .who-body {
+    max-width: 68ch;
+  }
+  .who-body p {
+    color: var(--gsck-mute);
+    font-size: clamp(1rem, 1.4vw, 1.15rem);
+    line-height: 1.75;
+    margin-bottom: 1.15rem;
+  }
+  .who-pull {
+    color: var(--gsck-orange) !important;
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 3vw, 2rem) !important;
+    letter-spacing: 0.03em;
+    line-height: 1.2 !important;
+    margin-top: 1.25rem !important;
+  }
+</style>

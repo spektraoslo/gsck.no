@@ -1,0 +1,574 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import {
+  superLeagueMatches,
+  t20Matches,
+  computeStats,
+  outcomeFor,
+  parseScores,
+  displayName,
+  isGSCK,
+  gsckSuperLeagueStanding,
+  gsckT20Standing,
+  ordinal,
+  type Match,
+} from '../data/matches';
+
+// Load match reports and index by (date + opponent) for cross-linking.
+const reports = await getCollection('reports');
+type Report = CollectionEntry<'reports'>;
+
+function findReport(m: Match): Report | undefined {
+  const opponent = isGSCK(m.teamOne) ? m.teamTwo : m.teamOne;
+  return reports.find(
+    (r) => r.data.matchDate === m.date && r.data.opponent === opponent,
+  );
+}
+
+const superStats = computeStats(superLeagueMatches);
+const t20Stats = computeStats(t20Matches);
+
+// Sort each league's matches by date (most recent first)
+const sortByDateDesc = (a: Match, b: Match) => (a.date < b.date ? 1 : -1);
+const superSorted = [...superLeagueMatches].sort(sortByDateDesc);
+const t20Sorted = [...t20Matches].sort(sortByDateDesc);
+
+const dateFmt = (iso: string) =>
+  new Date(iso).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
+const leagues = [
+  { key: 'super', name: 'Super League', sub: 'Qualifying A', stats: superStats, matches: superSorted, standing: gsckSuperLeagueStanding },
+  { key: 't20',   name: 'T20 League',   sub: 'Qualifying B', stats: t20Stats,   matches: t20Sorted,   standing: gsckT20Standing         },
+] as const;
+---
+
+<Layout title="Matches">
+  <section class="section">
+    <div class="container">
+      <div class="section-eyebrow">2026 Season</div>
+      <h1 class="section-title">Matches</h1>
+      <p class="lede">
+        Results and standings for GSCK across the 2026 Norwegian Cricket Federation
+        Super League (Qualifying&nbsp;A) and T20 League (Qualifying&nbsp;B).
+      </p>
+
+      <!-- Season summary cards — also act as league tabs -->
+      <div class="summary" role="tablist" aria-label="League selector">
+        {leagues.map((l, idx) => (
+          <article
+            class:list={['summary-card', { active: idx === 0 }]}
+            role="tab"
+            tabindex={idx === 0 ? 0 : -1}
+            aria-selected={idx === 0 ? 'true' : 'false'}
+            aria-controls={`panel-${l.key}`}
+            id={`tab-${l.key}`}
+            data-tab={l.key}
+          >
+            <header>
+              <div class="sc-heading">
+                <div class="sc-league">{l.name}</div>
+                <div class="sc-sub">{l.sub}</div>
+              </div>
+              <div class="sc-pos" title={`GSCK sits ${ordinal(l.standing.position)} of ${l.standing.totalTeams} in the table`}>
+                <span class="pos-num">{ordinal(l.standing.position)}</span>
+                <span class="pos-of">of {l.standing.totalTeams}</span>
+              </div>
+            </header>
+            <div class="sc-stats">
+              <div class="stat"><span class="sv">{l.stats.played}</span><span class="sl">Played</span></div>
+              <div class="stat wins"><span class="sv">{l.stats.won}</span><span class="sl">Won</span></div>
+              <div class="stat"><span class="sv">{l.stats.lost}</span><span class="sl">Lost</span></div>
+              <div class="stat"><span class="sv">{l.stats.noResult}</span><span class="sl">No Result</span></div>
+              <div class="stat points"><span class="sv">{l.stats.points}</span><span class="sl">Points</span></div>
+            </div>
+            <div class="sc-meta">
+              <div class="sc-form" aria-label={`Last ${l.stats.form.length} results`}>
+                <span class="form-label">Form</span>
+                {l.stats.form.map((o) => (
+                  <span class:list={['pip', o.toLowerCase()]}>{o}</span>
+                ))}
+              </div>
+              <div class="sc-nrr">
+                <span class="form-label">Net RR</span>
+                <span class:list={['nrr-val', l.standing.netRr >= 0 ? 'pos' : 'neg']}>
+                  {l.standing.netRr > 0 ? '+' : ''}{l.standing.netRr.toFixed(3)}
+                </span>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <!-- Match lists per league (tabpanels, one visible at a time) -->
+      {leagues.map((l, idx) => (
+        <section
+          class="league-panel"
+          id={`panel-${l.key}`}
+          role="tabpanel"
+          aria-labelledby={`tab-${l.key}`}
+          data-panel={l.key}
+          hidden={idx !== 0}
+        >
+          <h2 class="panel-heading">
+            <span class="panel-heading-main">{l.name}</span>
+            <span class="panel-heading-sub">{l.sub} · {l.matches.length} matches</span>
+          </h2>
+
+          <ul class="match-list">
+            {l.matches.map((m) => {
+              const o = outcomeFor(m);
+              const scores = parseScores(m);
+              const gsckIsOne = isGSCK(m.teamOne);
+              const gsckIsTwo = isGSCK(m.teamTwo);
+              return (
+                <li class="match">
+                  <div class="match-head">
+                    <span class="match-date">{dateFmt(m.date)}</span>
+                    <span class="match-type">{m.matchType}</span>
+                    <span class:list={['outcome', o.toLowerCase()]}>{o}</span>
+                  </div>
+
+                  <div class="teams">
+                    <div class:list={['team', { us: gsckIsOne }]}>
+                      <span class="team-name">{displayName(m.teamOne)}</span>
+                      <span class="team-score">
+                        {scores.one ? `${scores.one.score} (${scores.one.overs})` : '—'}
+                      </span>
+                    </div>
+                    <div class:list={['team', { us: gsckIsTwo }]}>
+                      <span class="team-name">{displayName(m.teamTwo)}</span>
+                      <span class="team-score">
+                        {scores.two ? `${scores.two.score} (${scores.two.overs})` : '—'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="match-result">{m.result}</div>
+
+                  {findReport(m) && (
+                    <a class="report-link" href={`/matches/${findReport(m)!.id}`}>
+                      Read match report →
+                    </a>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ))}
+
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .lede {
+    color: var(--gsck-mute);
+    max-width: 60ch;
+    font-size: 1.05rem;
+    margin-top: 0.5rem;
+  }
+
+  /* ── Summary cards ─────────────────────────── */
+  .summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin: 2.5rem 0 3rem;
+  }
+
+  .summary-card {
+    position: relative;
+    background: linear-gradient(180deg, rgba(255, 101, 0, 0.06), rgba(15, 15, 16, 0.02));
+    border: 1px solid var(--gsck-orange-soft);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.2s, border-color 0.2s, opacity 0.2s;
+    opacity: 0.72;
+  }
+  .summary-card:hover {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+  .summary-card:focus-visible {
+    outline: 3px solid var(--gsck-orange);
+    outline-offset: 3px;
+  }
+
+  .summary-card.active {
+    opacity: 1;
+    border-color: var(--gsck-orange);
+    border-width: 2px;
+    padding: calc(1.5rem - 1px); /* keep size the same when border thickens */
+    box-shadow: 0 15px 45px rgba(255, 101, 0, 0.20);
+  }
+
+  /* Bottom "connector" strip on the active card — visually links to the panel below */
+  .summary-card.active::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -14px;
+    transform: translateX(-50%);
+    border: 8px solid transparent;
+    border-top-color: var(--gsck-orange);
+  }
+
+  .summary-card header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .sc-heading { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+
+  .sc-league {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    letter-spacing: 0.05em;
+  }
+
+  .sc-sub {
+    color: var(--gsck-mute);
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .sc-pos {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.55rem 0.85rem;
+    background: var(--gsck-orange);
+    color: var(--gsck-black);
+    border-radius: var(--radius-md);
+    box-shadow: 0 6px 20px rgba(255, 101, 0, 0.35);
+    min-width: 78px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .pos-num {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    line-height: 1;
+    letter-spacing: 0.02em;
+  }
+
+  .pos-of {
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-top: 3px;
+    opacity: 0.75;
+  }
+
+  .sc-stats {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+    padding: 1rem 0;
+    border-top: 1px solid var(--gsck-faint);
+    border-bottom: 1px solid var(--gsck-faint);
+    margin-bottom: 1rem;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
+  }
+
+  .sv {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    line-height: 1;
+    color: var(--gsck-white);
+  }
+
+  .sl {
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gsck-mute);
+  }
+
+  .stat.wins .sv { color: var(--gsck-orange); }
+  .stat.points .sv { color: var(--gsck-orange); }
+  .stat.points {
+    position: relative;
+  }
+  .stat.points::before {
+    content: '';
+    position: absolute;
+    left: -0.4rem;
+    top: 10%;
+    bottom: 10%;
+    width: 1px;
+    background: var(--gsck-orange-soft);
+  }
+
+  .sc-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .sc-form {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .sc-nrr {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .nrr-val {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    letter-spacing: 0.03em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .nrr-val.pos { color: var(--gsck-orange); }
+  .nrr-val.neg { color: rgba(15, 15, 16, 0.55); }
+
+  .form-label {
+    color: var(--gsck-mute);
+    font-size: 0.65rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-right: 0.5rem;
+  }
+
+  .pip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+  }
+  .pip.w  { background: var(--gsck-orange); color: var(--gsck-black); }
+  .pip.l  { background: rgba(15, 15, 16, 0.08); color: rgba(15, 15, 16, 0.55); border: 1px solid var(--gsck-faint); }
+  .pip.nr { background: transparent; color: var(--gsck-mute); border: 1px solid var(--gsck-faint); }
+
+  /* ── League panel (shown when its card is active) ── */
+  .league-panel {
+    margin-top: 2rem;
+  }
+  .league-panel[hidden] { display: none; }
+
+  .panel-heading {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--gsck-faint);
+  }
+  .panel-heading-main {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3vw, 2rem);
+    letter-spacing: 0.05em;
+    color: var(--gsck-ink);
+  }
+  .panel-heading-sub {
+    color: var(--gsck-mute);
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .match-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .match {
+    background: linear-gradient(180deg, rgba(15, 15, 16, 0.03), rgba(15, 15, 16, 0.01));
+    border: 1px solid var(--gsck-faint);
+    border-radius: var(--radius-md);
+    padding: 1.1rem 1.35rem;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+
+  .match:hover {
+    border-color: var(--gsck-orange-soft);
+    transform: translateY(-2px);
+  }
+
+  .match-head {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 0.85rem;
+    font-size: 0.75rem;
+    color: var(--gsck-mute);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .match-date { font-weight: 600; color: var(--gsck-white); letter-spacing: 0.05em; }
+  .match-type { padding: 3px 8px; border: 1px solid var(--gsck-faint); border-radius: 999px; font-size: 0.6rem; }
+
+  .outcome {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+  }
+  .outcome.w  { background: var(--gsck-orange); color: var(--gsck-black); box-shadow: 0 0 16px rgba(255, 101, 0, 0.35); }
+  .outcome.l  { background: rgba(15, 15, 16, 0.08); color: rgba(15, 15, 16, 0.75); border: 1px solid var(--gsck-faint); }
+  .outcome.nr { background: transparent; color: var(--gsck-mute); border: 1px dashed var(--gsck-faint); }
+
+  .teams {
+    display: grid;
+    gap: 0.35rem;
+    padding-block: 0.5rem;
+  }
+
+  .team {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .team.us .team-name {
+    color: var(--gsck-orange);
+    font-weight: 700;
+  }
+
+  .team-name {
+    color: rgba(15, 15, 16, 0.85);
+    font-weight: 500;
+  }
+
+  .team-score {
+    font-variant-numeric: tabular-nums;
+    color: var(--gsck-mute);
+    font-size: 0.9rem;
+    letter-spacing: 0.02em;
+  }
+
+  .team.us .team-score {
+    color: var(--gsck-white);
+  }
+
+  .match-result {
+    margin-top: 0.5rem;
+    padding-top: 0.65rem;
+    border-top: 1px dashed var(--gsck-faint);
+    font-size: 0.8rem;
+    color: var(--gsck-mute);
+    letter-spacing: 0.03em;
+  }
+
+  .report-link {
+    display: inline-block;
+    margin-top: 0.85rem;
+    color: var(--gsck-orange);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: transform 0.15s;
+  }
+  .report-link:hover {
+    opacity: 1;
+    transform: translateX(3px);
+  }
+
+  .footnote {
+    margin-top: 3rem;
+    color: var(--gsck-mute);
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    text-align: center;
+  }
+
+  @media (max-width: 720px) {
+    .summary { grid-template-columns: 1fr; }
+    .sc-stats { grid-template-columns: repeat(3, 1fr); row-gap: 1rem; }
+    .stat.points::before { display: none; }
+    /* Hide the arrow "connector" on stacked mobile layout — points nowhere useful */
+    .summary-card.active::after { display: none; }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const tabs = Array.from(document.querySelectorAll('[data-tab]'));
+    const panels = Array.from(document.querySelectorAll('[data-panel]'));
+
+    function activate(key, focus) {
+      tabs.forEach((t) => {
+        const on = t.dataset.tab === key;
+        t.classList.toggle('active', on);
+        t.setAttribute('aria-selected', String(on));
+        t.setAttribute('tabindex', on ? '0' : '-1');
+        if (on && focus) t.focus();
+      });
+      panels.forEach((p) => {
+        p.hidden = p.dataset.panel !== key;
+      });
+      if (location.hash.replace('#', '') !== key) {
+        history.replaceState(null, '', '#' + key);
+      }
+    }
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => activate(tab.dataset.tab));
+      tab.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          activate(tab.dataset.tab);
+        }
+        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+          e.preventDefault();
+          const idx = tabs.indexOf(tab);
+          const nextIdx = e.key === 'ArrowRight'
+            ? (idx + 1) % tabs.length
+            : (idx - 1 + tabs.length) % tabs.length;
+          activate(tabs[nextIdx].dataset.tab, true);
+        }
+      });
+    });
+
+    // Deep-link support: /matches#t20 or /matches#super
+    const initial = location.hash.replace('#', '');
+    if (initial && tabs.some((t) => t.dataset.tab === initial)) {
+      activate(initial);
+    }
+  })();
+</script>

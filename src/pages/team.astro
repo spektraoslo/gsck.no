@@ -1,0 +1,223 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { players, leadership } from '../data/players';
+---
+
+<Layout title="Team">
+  <section class="section">
+    <div class="container">
+      <div class="section-eyebrow">Squad · 2026 Season</div>
+      <h1 class="section-title">The Team</h1>
+      <p class="lede">
+        {players.length} players representing GSCK in the Norwegian Cricket Federation
+        Super League (Qualifying&nbsp;A) and T20 League (Qualifying&nbsp;B).
+      </p>
+
+      <!-- Leadership -->
+      <div class="leadership">
+        <article class="lead-card">
+          <div class="lead-league">Super League</div>
+          <div class="lead-row">
+            <div class="lead-role">
+              <span class="badge c">C</span>
+              <div>
+                <div class="lead-role-name">Captain</div>
+                <div class="lead-player">{leadership.superLeague.captain.name}</div>
+              </div>
+            </div>
+            <div class="lead-role">
+              <span class="badge vc">VC</span>
+              <div>
+                <div class="lead-role-name">Vice-captain</div>
+                <div class="lead-player">{leadership.superLeague.viceCaptain.name}</div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="lead-card">
+          <div class="lead-league">T20 League</div>
+          <div class="lead-row">
+            <div class="lead-role">
+              <span class="badge c">C</span>
+              <div>
+                <div class="lead-role-name">Captain</div>
+                <div class="lead-player">{leadership.t20.captain.name}</div>
+              </div>
+            </div>
+            <div class="lead-role">
+              <span class="badge vc">VC</span>
+              <div>
+                <div class="lead-role-name">Vice-captain</div>
+                <div class="lead-player">{leadership.t20.viceCaptain.name}</div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- Roster -->
+      <h2 class="roster-title">Squad List</h2>
+      <ol class="roster">
+        {players.map((p, i) => (
+          <li class="row">
+            <span class="num">{String(i + 1).padStart(2, '0')}</span>
+            <span class="name">{p.name}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .lede {
+    color: var(--gsck-mute);
+    max-width: 60ch;
+    font-size: 1.05rem;
+    margin-top: 0.5rem;
+  }
+
+  /* Leadership */
+  .leadership {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin: 2.5rem 0 3rem;
+  }
+
+  .lead-card {
+    background: linear-gradient(180deg, rgba(255, 101, 0, 0.06), rgba(15, 15, 16, 0.02));
+    border: 1px solid var(--gsck-orange-soft);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+  }
+
+  .lead-league {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    letter-spacing: 0.06em;
+    margin-bottom: 1.25rem;
+    color: var(--gsck-white);
+  }
+
+  .lead-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+
+  .lead-role {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+
+  .badge.c {
+    background: var(--gsck-orange);
+    color: var(--gsck-black);
+    box-shadow: 0 0 20px rgba(255, 101, 0, 0.45);
+  }
+
+  .badge.vc {
+    background: transparent;
+    color: var(--gsck-orange);
+    border: 1.5px solid var(--gsck-orange);
+  }
+
+  .lead-role-name {
+    color: var(--gsck-mute);
+    font-size: 0.65rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+
+  .lead-player {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gsck-white);
+    line-height: 1.2;
+  }
+
+  /* Roster */
+  .roster-title {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+    color: var(--gsck-white);
+  }
+
+  .roster {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: linear-gradient(90deg, rgba(15, 15, 16, 0.03), rgba(15, 15, 16, 0.01));
+    border: 1px solid var(--gsck-faint);
+    border-radius: var(--radius-md);
+    transition: transform 0.15s, border-color 0.15s, background 0.15s;
+  }
+
+  .row:hover {
+    transform: translateX(4px);
+    border-color: var(--gsck-orange-soft);
+    background: linear-gradient(90deg, rgba(255, 101, 0, 0.06), rgba(255, 101, 0, 0.02));
+  }
+
+  .num {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    color: var(--gsck-orange);
+    letter-spacing: 0.05em;
+    line-height: 1;
+  }
+
+  .name {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--gsck-white);
+  }
+
+  @media (max-width: 720px) {
+    .leadership {
+      grid-template-columns: 1fr;
+    }
+    .lead-row {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .row {
+      grid-template-columns: 44px 1fr;
+    }
+    .num {
+      font-size: 1.4rem;
+    }
+  }
+</style>
