@@ -29,11 +29,6 @@ const icons: Record<string, string> = {
     <div class="container">
       <div class="section-eyebrow">Get in touch</div>
       <h1 class="section-title">Contact</h1>
-      <p class="lede">
-        Questions about the club, joining a squad, the Open Day, or Women &amp; Kids
-        cricket at GSCK? We'd love to hear from you.
-      </p>
-
       <div class="contact-grid">
         {contacts.map((c) => (
           <a class:list={['contact-card', c.kind]} href={c.href} target={c.kind === 'instagram' ? '_blank' : undefined} rel={c.kind === 'instagram' ? 'noopener' : undefined}>
@@ -55,14 +50,6 @@ const icons: Record<string, string> = {
 </Layout>
 
 <style>
-  .lede {
-    color: var(--gsck-mute);
-    max-width: 60ch;
-    font-size: 1.05rem;
-    margin-top: 0.5rem;
-    margin-bottom: 2.5rem;
-  }
-
   .contact-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
