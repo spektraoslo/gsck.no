@@ -17,6 +17,10 @@
   --gsck-green-dim:   rgba(31, 90, 58, 0.10);
   --gsck-green-soft:  rgba(31, 90, 58, 0.30);
 
+  /* Sponsor: OBOS (colours from OBOS' sponsor guidelines) */
+  --obos-blue:        #0047BA;   /* OBOS Blå — background for the white logo */
+  --obos-hav:         #002169;   /* Hav */
+
   /* Semantic aliases (kept for compatibility with per-page CSS) */
   --gsck-black:       var(--gsck-ink);                 /* dark surface / button text */
   --gsck-white:       var(--gsck-ink);                 /* main text — now dark on cream */
