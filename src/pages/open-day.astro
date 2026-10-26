@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 
 const obosUrl = 'https://www.obos.no';
+const ncfUrl = 'https://cricketforbundet.no/gsck-open-day-2026-oppdag-cricket-for-barn-ungdom-og-kvinner/';
 
 // Portrait photos (the rest are landscape); the band makes them 1200×1986 / 1800×1389.
 const portrait = new Set([
@@ -183,10 +184,10 @@ const infoStrip = [
       <div class="od-hero-visual">
         <div class="collage">
           <div class="tile tile-photo">
-            <img src="/openday-kids.jpg" alt="Kids playing cricket at practice" />
+            <img src="/openday-2026/hero/kids-playing.jpg" alt="A boy bowling to a young batter on the pitch at GSCK Open Day 2026" />
           </div>
           <div class="tile tile-illo">
-            <img src="/openday-female.avif" alt="Illustration of a female cricketer batting" />
+            <img src="/openday-2026/hero/girl-batting.jpg" alt="A girl batting at GSCK Open Day 2026" />
           </div>
           <div class="badge-float" aria-hidden="true">
             <img src="/gsck-logo.png" alt="" />
@@ -300,6 +301,11 @@ const infoStrip = [
       <div class="cta-poster">
         <a href="/openday-poster.jpg" target="_blank" rel="noopener" aria-label="View the full Open Day poster">
           <img src="/openday-poster.jpg" alt="GSCK Open Day poster, supported by OBOS" />
+        </a>
+        <a class="ncf-link" href={ncfUrl} target="_blank" rel="noopener">
+          <span class="ncf-label">Announced by Norges Cricketforbund</span>
+          <span class="ncf-title">GSCK Åpen dag 2026 – Oppdag cricket for barn, ungdom og kvinner</span>
+          <span class="ncf-cta">Read on cricketforbundet.no ↗</span>
         </a>
       </div>
     </div>
@@ -519,7 +525,7 @@ const infoStrip = [
   .collage {
     position: relative;
     width: min(460px, 100%);
-    aspect-ratio: 1;
+    aspect-ratio: 460 / 380;
   }
   .tile {
     position: absolute;
@@ -528,25 +534,23 @@ const infoStrip = [
     border: 3px solid var(--gsck-orange);
     box-shadow: 0 20px 60px rgba(255, 101, 0, 0.25);
   }
+  /* Both photos are 3:2 landscape: the big one top-right, the small one bottom-left,
+     placed so the small tile only overlaps grass in the big photo. */
   .tile-photo {
-    inset: 0 20% 30% 0;
+    top: 0; right: 0;
+    width: 86%; aspect-ratio: 3 / 2;
     animation: float 8s ease-in-out infinite;
   }
   .tile-illo {
-    right: 0; bottom: 0;
-    width: 62%; aspect-ratio: 1;
-    background: linear-gradient(135deg, #fff2e0, #ffd7a8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    left: 0; bottom: 0;
+    width: 58%; aspect-ratio: 3 / 2;
     animation: float 8s ease-in-out infinite reverse;
   }
   .tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .tile-illo img { object-fit: contain; padding: 12px; }
   .badge-float {
     position: absolute;
-    left: -4%; bottom: 4%;
-    width: 22%; aspect-ratio: 1;
+    left: 2%; top: 4%;
+    width: 20%; aspect-ratio: 1;
     border-radius: 50%;
     background: var(--gsck-black);
     border: 3px solid var(--gsck-orange);
@@ -661,8 +665,35 @@ const infoStrip = [
   /* ── POSTER ───────────────────────────────────────── */
   .cta-poster {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
   }
+
+  /* Link to the NCF announcement, under the poster */
+  .cta-poster a.ncf-link {
+    width: min(100%, 420px);
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 1.1rem 1.25rem;
+    border-radius: var(--radius-md);
+    background: #fff;
+    border: 1px solid var(--gsck-faint);
+    border-left: 4px solid var(--gsck-orange);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    color: var(--gsck-ink);
+    text-decoration: none;
+  }
+  .ncf-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gsck-mute);
+  }
+  .ncf-title { font-weight: 600; line-height: 1.4; }
+  .ncf-cta { color: var(--gsck-orange); font-weight: 600; font-size: 0.9rem; }
+  .cta-poster a.ncf-link:hover .ncf-cta { text-decoration: underline; }
 
   .cta-poster a {
     display: block;
